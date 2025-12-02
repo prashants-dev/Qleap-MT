@@ -1,0 +1,38 @@
+.global-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 24px 32px;
+  z-index: 1000;
+}
+
+.global-header.transparent {
+  background: transparent;
+}
+
+.company-logo {
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.3s;
+  display: inline-block;
+}
+
+.company-logo:hover {
+  opacity: 0.8;
+}
+
+@media (max-width: 767px) {
+  .global-header {
+    padding: 16px 20px;
+  }
+  
+  .company-logo {
+    font-size: 20px;
+  }
+}

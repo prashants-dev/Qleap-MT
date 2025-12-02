@@ -1,0 +1,135 @@
+<div class="popup-overlay" (click)="closePopup()">
+  <div class="popup-content" (click)="$event.stopPropagation()">
+    
+    <!-- Header -->
+    <div class="popup-header">
+      <div class="header-content">
+        <span class="e-icons e-edit popup-icon"></span>
+        <h3>Update Staff</h3>
+      </div>
+      <button class="close-btn" (click)="closePopup()" type="button">
+        <span class="e-icons e-close"></span>
+      </button>
+    </div>
+    
+    <!-- Form -->
+    <form [formGroup]="staffForm" (ngSubmit)="onSubmit()" class="popup-body">
+      
+      <!-- Username Field -->
+      <div class="form-group">
+        <label for="username">
+          Username <span class="required">*</span>
+        </label>
+        <input
+          type="text"
+          id="username"
+          formControlName="username"
+          placeholder="Enter username"
+          [class.error]="username?.invalid && username?.touched"
+        />
+        <div class="error-message" *ngIf="username?.invalid && username?.touched">
+          <span *ngIf="username?.errors?.['required']">Username is required</span>
+          <span *ngIf="username?.errors?.['minlength']">Username must be at least 3 characters</span>
+        </div>
+      </div>
+
+      <!-- Email Field -->
+      <div class="form-group">
+        <label for="email">
+          Email <span class="required">*</span>
+        </label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          placeholder="Enter email address"
+          [class.error]="email?.invalid && email?.touched"
+        />
+        <div class="error-message" *ngIf="email?.invalid && email?.touched">
+          <span *ngIf="email?.errors?.['required']">Email is required</span>
+          <span *ngIf="email?.errors?.['email']">Please enter a valid email</span>
+        </div>
+      </div>
+
+      <!-- Password Field -->
+      <div class="form-group">
+        <label for="password">
+          Password <span class="optional">(optional)</span>
+        </label>
+        <div class="password-input-wrapper">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            id="password"
+            formControlName="password"
+            placeholder="Leave blank to keep current password"
+            [class.error]="password?.invalid && password?.touched"
+          />
+          <button 
+            type="button" 
+            class="toggle-password" 
+            (click)="togglePassword()"
+          >
+            <span class="e-icons" [class.e-eye]="!showPassword" [class.e-eye-slash]="showPassword"></span>
+          </button>
+        </div>
+        <div class="error-message" *ngIf="password?.invalid && password?.touched">
+          <span *ngIf="password?.errors?.['minlength']">Password must be at least 6 characters</span>
+        </div>
+        <div class="password-hint">
+          <small>Leave blank to keep current password. New password must be at least 6 characters.</small>
+        </div>
+      </div>
+
+      <!-- Confirm Password Field -->
+      <div class="form-group" *ngIf="password?.value">
+        <label for="confirmPassword">
+          Confirm Password <span class="required">*</span>
+        </label>
+        <div class="password-input-wrapper">
+          <input
+            [type]="showConfirmPassword ? 'text' : 'password'"
+            id="confirmPassword"
+            formControlName="confirmPassword"
+            placeholder="Re-enter password"
+            [class.error]="confirmPassword?.invalid && confirmPassword?.touched"
+          />
+          <button 
+            type="button" 
+            class="toggle-password" 
+            (click)="toggleConfirmPassword()"
+          >
+            <span class="e-icons" [class.e-eye]="!showConfirmPassword" [class.e-eye-slash]="showConfirmPassword"></span>
+          </button>
+        </div>
+        <div class="error-message" *ngIf="staffForm.errors?.['passwordMismatch'] && confirmPassword?.touched">
+          <span>Passwords do not match</span>
+        </div>
+      </div>
+
+      <!-- Error Alert -->
+      <div class="alert-message error" *ngIf="errorMessage">
+        <span class="e-icons e-error"></span>
+        {{ errorMessage }}
+      </div>
+
+      <!-- Success Alert -->
+      <div class="alert-message success" *ngIf="successMessage">
+        <span class="e-icons e-check"></span>
+        {{ successMessage }}
+      </div>
+      
+      <!-- Footer Buttons -->
+      <div class="popup-footer">
+        <button type="button" class="btn-cancel" (click)="closePopup()" [disabled]="isSubmitting">
+          Cancel
+        </button>
+        <button type="submit" class="btn-submit" [disabled]="isSubmitting || staffForm.invalid">
+          <span *ngIf="!isSubmitting" class="e-icons e-check"></span>
+          <span *ngIf="isSubmitting" class="spinner"></span>
+          {{ isSubmitting ? 'Updating...' : 'Update Staff' }}
+        </button>
+      </div>
+    </form>
+
+  </div>
+</div>

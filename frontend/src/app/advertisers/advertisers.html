@@ -1,0 +1,103 @@
+<div class="layout">
+  <!-- Sidebar -->
+  <div class="side-menu" [class.open]="menuOpen">
+    <!-- Profile Section - Using ProfileComponent -->
+    <app-profile [showInSidebar]="true" (logoutClick)="handleLogout()">
+    </app-profile>
+
+    <ul>
+      <li (click)="createCampaign()">
+        <span class="e-icons e-plus"></span>
+        Create Campaign
+      </li>
+      <li (click)="goBack()">
+        <span class="e-icons e-home"></span>
+        Go to Dashboard
+      </li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content" [class.shrink]="menuOpen">
+    <div class="dashboard-container">
+      <!-- Top Bar -->
+      <button class="back-btn" (click)="goBack()">
+        <span class="e-icons e-chevron-left"></span> Back
+      </button>
+      <div class="dashboard-header top-bar">
+        <span class="hamburger" (click)="toggleMenu()">&#9776;</span>
+        <h1>Advertisers Dashboard</h1>
+        <button class="primary-btn" (click)="createCampaign()">
+          <span class="e-icons e-plus"></span> Create Campaign
+        </button>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="e-icons e-folder stat-icon"></span>
+          <div class="stat-content">
+            <h3>{{ stats.totalCampaigns }}</h3>
+            <p>Total Campaigns</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <span class="e-icons e-play-circle stat-icon active"></span>
+          <div class="stat-content">
+            <h3>{{ stats.activeCampaigns }}</h3>
+            <p>Active Campaigns</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <span class="e-icons e-dollar stat-icon"></span>
+          <div class="stat-content">
+            <h3>${{ stats.totalSpend | number }}</h3>
+            <p>Total Spend</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <span class="e-icons e-eye stat-icon"></span>
+          <div class="stat-content">
+            <h3>{{ stats.impressions | number }}</h3>
+            <p>Impressions</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Campaigns -->
+      <div class="campaigns-section">
+        <h2>Recent Campaigns</h2>
+        <div class="campaigns-table">
+          <div class="table-header">
+            <div class="col">Campaign Name</div>
+            <div class="col">Status</div>
+            <div class="col">Budget</div>
+            <div class="col">Spent</div>
+            <div class="col">Actions</div>
+          </div>
+          <div class="table-row" *ngFor="let campaign of recentCampaigns">
+            <div class="col">{{ campaign.name }}</div>
+            <div class="col">
+              <span
+                class="status-badge"
+                [class]="campaign.status.toLowerCase()"
+              >
+                {{ campaign.status }}
+              </span>
+            </div>
+            <div class="col">${{ campaign.budget | number }}</div>
+            <div class="col">${{ campaign.spent | number }}</div>
+            <div class="col">
+              <button class="action-btn" (click)="viewCampaign(campaign)">
+                View
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overlay for mobile sidebar -->
+  <div class="overlay" *ngIf="menuOpen" (click)="toggleMenu()"></div>
+</div>

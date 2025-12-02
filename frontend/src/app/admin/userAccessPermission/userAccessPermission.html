@@ -1,0 +1,26 @@
+<div class="permissions-container">
+  <h2>Role-Based Access Permissions</h2>
+
+  <table class="permissions-table">
+    <thead>
+      <tr>
+        <th>Permission</th>
+        <th *ngFor="let role of roles">{{ role.role_name }}</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let perm of permissions">
+        <td>{{ perm.description }}</td>
+
+        <td *ngFor="let role of roles" class="checkbox-cell">
+          <input
+            type="checkbox"
+            [checked]="hasPermission(role, perm)"
+            (change)="togglePermission(role, perm, $event)"
+          />
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

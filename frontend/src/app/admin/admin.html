@@ -1,0 +1,115 @@
+<div class="admin-container" [class.sidebar-open]="showSidebar">
+  <!-- Sidebar -->
+  <div class="sidebar" [class.active]="showSidebar">
+    <!-- Profile Section - Now using ProfileComponent at the top -->
+    <app-profile 
+      [showInSidebar]="true" 
+      (logoutClick)="handleLogout()">
+    </app-profile>
+
+    <h3 class="sidebar-title">Dashboard Menu</h3>
+    <ul>
+      <li
+        (click)="openSection('users')"
+        [class.active]="activeSection === 'users'"
+      >
+        <span class="e-icons e-people"></span> User Management
+      </li>
+      <li
+        (click)="openSection('access')"
+        [class.active]="activeSection === 'access'"
+      >
+        <span class="e-icons e-lock"></span> User Access Permission
+      </li>
+      <li
+        (click)="openSection('media')"
+        [class.active]="activeSection === 'media'"
+      >
+        <span class="e-icons e-briefcase"></span> Role Management
+      </li>
+      <li
+        (click)="openSection('advertisers')"
+        [class.active]="activeSection === 'advertisers'"
+      >
+        <span class="e-icons e-bell"></span> Advertisers
+      </li>
+    </ul>
+
+    <!-- Logout button in sidebar (for mobile) -->
+    <div class="sidebar-footer">
+      <!-- <button class="logout-btn-sidebar" (click)="openLogoutPopup()">
+        <span class="e-icons e-sign-out"></span> Logout
+      </button> -->
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div class="main-content">
+    <div class="header">
+      <div class="hamburger" (click)="toggleSidebar()">
+        <div class="hamburger-line"></div>
+        <div class="hamburger-line"></div>
+        <div class="hamburger-line"></div>
+      </div>
+
+      <h2>Admin Dashboard</h2>
+
+      <!-- Profile button and dropdown removed -->
+    </div>
+
+    <!-- Content sections -->
+    <div *ngIf="activeSection === 'dashboard'">
+      <h3>Welcome to Admin Dashboard</h3>
+      <p>Select an option from the sidebar to get started.</p>
+    </div>
+
+    <div *ngIf="activeSection === 'access'">
+      <app-user-access-permission></app-user-access-permission>
+    </div>
+
+    <div *ngIf="activeSection === 'users'">
+      <app-user-management></app-user-management>
+    </div>
+
+    <div *ngIf="activeSection === 'media'">
+      <app-role-management></app-role-management>
+    </div>
+
+    <div *ngIf="activeSection === 'advertisers'">
+      <h3>Advertisers Management</h3>
+      <p>Advertisers content will appear here.</p>
+    </div>
+  </div>
+
+  <!-- Overlay for mobile sidebar -->
+  <div class="overlay" *ngIf="showSidebar" (click)="toggleSidebar()"></div>
+
+  <!-- Logout Confirmation Popup -->
+  <div
+    class="popup-overlay"
+    *ngIf="showLogoutPopup"
+    (click)="closeLogoutPopup()"
+  >
+    <div class="popup-content" (click)="$event.stopPropagation()">
+      <div class="popup-header">
+        <span class="e-icons e-sign-out popup-icon"></span>
+        <h3>Confirm Logout</h3>
+      </div>
+
+      <div class="popup-body">
+        <p>Are you sure you want to logout?</p>
+        <p class="popup-subtitle">
+          You will need to login again to access the dashboard.
+        </p>
+      </div>
+
+      <div class="popup-footer">
+        <button class="btn-cancel" (click)="closeLogoutPopup()">Cancel</button>
+        <button class="btn-confirm" (click)="confirmLogout()">
+          <span class="e-icons e-sign-out"></span>
+          Logout
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

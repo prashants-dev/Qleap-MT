@@ -1,0 +1,213 @@
+<div class="role-container">
+  <!-- Header Section -->
+  <div class="header-row">
+    <h2>Role Management</h2>
+    <button class="create-btn" (click)="openPopup()">
+      <span class="e-icons e-plus"></span> Create Role
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading roles...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !isLoading" class="error-state">
+    <span class="e-icons e-warning"></span>
+    <p>{{ error }}</p>
+    <button class="retry-btn" (click)="loadRoles()">
+      <span class="e-icons e-reload"></span> Retry
+    </button>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && !error && roles.length === 0" class="empty-state">
+    <span class="e-icons e-folder-open"></span>
+    <h3>No Roles Found</h3>
+    <p>Get started by creating your first role</p>
+    <button class="create-btn" (click)="openPopup()">
+      <span class="e-icons e-plus"></span> Create Role
+    </button>
+  </div>
+
+  <!-- Table -->
+  <div *ngIf="!isLoading && !error && roles.length > 0" class="table-wrapper">
+    <table class="role-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Role Name</th>
+          <th>Description</th>
+          <th>Created At</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let role of roles; let i = index"
+          [class.even]="i % 2 === 0"
+        >
+          <td>{{ role.id }}</td>
+          <td><span class="role-badge">{{ role.name }}</span></td>
+          <td>{{ role.description || 'No description' }}</td>
+          <td>{{ role.created_at | date:'medium' }}</td>
+          <td>
+            <div class="action-buttons">
+              <button
+                class="edit-btn"
+                (click)="openEditPopup(role)"
+                title="Edit"
+              >
+                <span class="e-icons e-edit"></span> Edit
+              </button>
+              <button
+                class="delete-btn"
+                (click)="confirmDelete(role.id)"
+                title="Delete"
+              >
+                <span class="e-icons e-trash"></span> Delete
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Create/Edit Popup -->
+<div class="popup-overlay" *ngIf="popupOpen" (click)="closePopup()">
+  <div class="popup" (click)="$event.stopPropagation()">
+    <div class="popup-header">
+      <h3>
+        <span
+          class="e-icons"
+          [class.e-plus]="!isEdit"
+          [class.e-edit]="isEdit"
+        ></span>
+        {{ isEdit ? 'Edit Role' : 'Create New Role' }}
+      </h3>
+      <button class="close-icon-btn" (click)="closePopup()" type="button">
+        <span class="e-icons e-close"></span>
+      </button>
+    </div>
+
+    <form (ngSubmit)="isEdit ? updateRole() : createRole()" #roleForm="ngForm">
+      <div class="form-group">
+        <label for="roleName">Role Name <span class="required">*</span></label>
+        <input
+          type="text"
+          id="roleName"
+          [(ngModel)]="form.name"
+          name="name"
+          placeholder="e.g., ADMIN, MANAGER"
+          required
+          [disabled]="isSubmitting"
+          #nameInput="ngModel"
+        />
+        <div
+          class="error-message"
+          *ngIf="nameInput.invalid && nameInput.touched"
+        >
+          <span class="e-icons e-error"></span> Role name is required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="roleDescription"
+          >Description <span class="required">*</span></label
+        >
+        <textarea
+          id="roleDescription"
+          [(ngModel)]="form.description"
+          name="description"
+          placeholder="Describe the role's responsibilities"
+          rows="4"
+          required
+          [disabled]="isSubmitting"
+          #descInput="ngModel"
+        ></textarea>
+        <div
+          class="error-message"
+          *ngIf="descInput.invalid && descInput.touched"
+        >
+          <span class="e-icons e-error"></span> Description is required
+        </div>
+      </div>
+
+      <!-- Success/Error Messages -->
+      <div class="alert-message success" *ngIf="successMessage">
+        <span class="e-icons e-check"></span>
+        {{ successMessage }}
+      </div>
+
+      <div class="alert-message error" *ngIf="errorMessage">
+        <span class="e-icons e-error"></span>
+        {{ errorMessage }}
+      </div>
+
+      <div class="popup-actions">
+        <button
+          type="button"
+          class="cancel-btn"
+          (click)="closePopup()"
+          [disabled]="isSubmitting"
+        >
+          <span class="e-icons e-close"></span> Cancel
+        </button>
+        <button
+          type="submit"
+          class="submit-btn"
+          [disabled]="roleForm.invalid || isSubmitting"
+        >
+          <span *ngIf="isSubmitting" class="spinner-small"></span>
+          <span *ngIf="!isSubmitting" class="e-icons e-check"></span>
+          {{ isSubmitting ? 'Saving...' : (isEdit ? 'Update Role' : 'Create
+          Role') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Delete Confirmation Popup -->
+<div class="popup-overlay" *ngIf="deletePopup" (click)="closeDeletePopup()">
+  <div class="popup delete-popup" (click)="$event.stopPropagation()">
+    <div class="delete-icon-wrapper">
+      <span class="e-icons e-warning delete-warning-icon"></span>
+    </div>
+    <h3>Delete Role?</h3>
+    <p>
+      This action cannot be undone. Are you sure you want to permanently delete
+      this role?
+    </p>
+
+    <!-- Error Message in Delete Popup -->
+    <div class="alert-message error" *ngIf="errorMessage">
+      <span class="e-icons e-error"></span>
+      {{ errorMessage }}
+    </div>
+
+    <div class="popup-actions">
+      <button
+        type="button"
+        class="cancel-btn"
+        (click)="closeDeletePopup()"
+        [disabled]="isSubmitting"
+      >
+        <span class="e-icons e-close"></span> Cancel
+      </button>
+      <button
+        class="delete-confirm"
+        (click)="deleteRole()"
+        [disabled]="isSubmitting"
+      >
+        <span *ngIf="isSubmitting" class="spinner-small"></span>
+        <span *ngIf="!isSubmitting" class="e-icons e-trash"></span>
+        {{ isSubmitting ? 'Deleting...' : 'Delete' }}
+      </button>
+    </div>
+  </div>
+</div>

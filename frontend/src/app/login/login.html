@@ -1,0 +1,84 @@
+<div class="login-container">
+  <a [routerLink]="['/dashboard']" class="company-logo">Qleap Mediatech</a>
+  <div class="login-card">
+    <div class="login-header">
+      <h1>Login</h1>
+      <p>Please enter your email and password.</p>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <!-- Email Field -->
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          class="form-control"
+          [class.error]="email?.invalid && email?.touched"
+          placeholder="Enter email"
+        />
+        <div class="error-message" *ngIf="email?.invalid && email?.touched">
+          <span>Valid email required</span>
+        </div>
+      </div>
+
+      <!-- Password Field -->
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="password-wrapper">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            id="password"
+            formControlName="password"
+            class="form-control"
+            [class.error]="password?.invalid && password?.touched"
+            placeholder="Enter password"
+          />
+          <button
+            type="button"
+            class="password-toggle"
+            (click)="togglePasswordVisibility()"
+            [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+          >
+            <span class="e-icons" [ngClass]="showPassword ? 'e-eye-slash' : 'e-eye'"></span>
+          </button>
+        </div>
+        <div class="error-message" *ngIf="password?.invalid && password?.touched">
+          <span>Password required (min 6 chars)</span>
+        </div>
+      </div>
+
+      <!-- Remember Me & Forgot Password -->
+      <div class="form-options">
+        <label class="checkbox-label">
+          <input type="checkbox" formControlName="rememberMe" />
+          <span>Remember me</span>
+        </label>
+        <a href="#" class="forgot-password">Forgot Password?</a>
+      </div>
+
+      
+      <div class="success-banner" *ngIf="message">
+        {{ message }}
+      </div>
+      <div class="error-banner" *ngIf="error">
+        {{ error }}
+      </div>
+
+      <button
+        type="submit"
+        class="btn-login"
+        [disabled]="isSubmitting"
+      >
+        <span *ngIf="!isSubmitting">Login</span>
+        <span *ngIf="isSubmitting">Logging in...</span>
+      </button>
+
+  
+      <div class="signup-link">
+        Don't have an account? <a routerLink="/register">Register</a>
+      </div>
+    </form>
+  </div>
+</div>

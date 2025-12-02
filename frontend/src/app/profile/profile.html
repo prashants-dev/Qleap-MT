@@ -1,0 +1,203 @@
+<div class="sidebar-wrapper" *ngIf="!showAsDropdown">
+
+  <div class="sidebar-top">
+    <div class="sidebar-profile">
+      <div class="avatar">{{ getInitial() }}</div>
+
+      <div class="info">
+        <h4>{{ userProfile.username }}</h4>
+        <p>{{ userProfile.email }}</p>
+        <span class="role">{{ getRolesDisplay() }}</span>
+      </div>
+
+      <button
+        class="edit-profile-btn"
+        (click)="openEditProfile()"
+        title="Edit Profile"
+      >
+        <span class="e-icons e-edit"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- MIDDLE SECTION : Scrollable Menu -->
+  <div class="sidebar-menu">
+    
+    <ng-content></ng-content>
+  </div>
+
+  <!-- BOTTOM SECTION : Fixed Logout -->
+  <div class="sidebar-bottom">
+    <button class="logout-btn-bottom" (click)="openLogoutPopup()">
+      <span class="e-icons e-logout"></span>
+      <span>Logout</span>
+    </button>
+  </div>
+</div>
+
+<div *ngIf="showAsDropdown" class="profile-dropdown">
+  <div class="profile-card">
+    <div class="profile-header">
+      <div class="profile-avatar">{{ getInitial() }}</div>
+      <h3>{{ userProfile.username }}</h3>
+    </div>
+
+    <div class="profile-details">
+      <p><strong>Email:</strong> {{ userProfile.email }}</p>
+      <p><strong>Roles:</strong> {{ getRolesDisplay() }}</p>
+      <p>
+        <strong>Status:</strong>
+        <span
+          class="status-badge"
+          [class.active]="userProfile.status === 'active'"
+        >
+          {{ userProfile.status || 'active' }}
+        </span>
+      </p>
+    </div>
+
+    <div class="profile-actions">
+      <button class="edit-profile-btn-full" (click)="openEditProfile()">
+        <span class="e-icons e-edit"></span> Edit Profile
+      </button>
+
+      <button class="logout-btn-full" (click)="openLogoutPopup()">
+        <span class="e-icons e-logout"></span> Logout
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="popup-overlay" *ngIf="showEditPopup" (click)="closeEditPopup()">
+  <div class="popup-content" (click)="$event.stopPropagation()">
+    <div class="popup-header">
+      <span class="e-icons e-user popup-icon"></span>
+      <h3>Edit Profile</h3>
+      <button class="close-btn" (click)="closeEditPopup()">
+        <span class="e-icons e-close"></span>
+      </button>
+    </div>
+
+    <div class="popup-body">
+      <!-- Success Message -->
+      <div class="alert alert-success" *ngIf="updateSuccess">
+        <span class="e-icons e-check-circle"></span>
+        {{ updateSuccess }}
+      </div>
+
+      <!-- Error Message -->
+      <div class="alert alert-error" *ngIf="updateError">
+        <span class="e-icons e-error"></span>
+        {{ updateError }}
+      </div>
+
+      <form class="edit-form">
+        <!-- Username -->
+        <div class="form-group">
+          <label for="username">
+            Username <span class="required">*</span>
+          </label>
+          <input
+            type="text"
+            id="username"
+            [(ngModel)]="editForm.username"
+            name="username"
+            placeholder="Enter username"
+            required
+            [disabled]="isUpdating"
+          />
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="email"> Email <span class="required">*</span> </label>
+          <input
+            type="email"
+            id="email"
+            [(ngModel)]="editForm.email"
+            name="email"
+            placeholder="Enter email"
+            required
+            [disabled]="isUpdating"
+          />
+        </div>
+
+        <!-- ROLES (READONLY) -->
+        <div class="form-group">
+          <label>Role(s)</label>
+          <div class="readonly-field">
+            <span class="e-icons e-lock"></span>
+            {{ getRolesDisplay() }}
+          </div>
+        </div>
+
+        <!-- STATUS (READONLY) -->
+        <div class="form-group">
+          <label>Status</label>
+          <div class="readonly-field">
+            <span class="e-icons e-lock"></span>
+            <span
+              class="status-badge"
+              [class.active]="userProfile.status === 'active'"
+            >
+              {{ userProfile.status || 'active' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="info-note">
+          <span class="e-icons e-info"></span>
+          <p>
+            Only username and email can be edited. Contact administrator to
+            change roles or status.
+          </p>
+        </div>
+      </form>
+    </div>
+
+    <div class="popup-footer">
+      <button
+        class="btn-cancel"
+        (click)="closeEditPopup()"
+        [disabled]="isUpdating"
+      >
+        Cancel
+      </button>
+
+      <button
+        class="btn-confirm"
+        (click)="updateProfile()"
+        [disabled]="isUpdating"
+      >
+        <span class="e-icons e-loading" *ngIf="isUpdating"></span>
+        <span class="e-icons e-save" *ngIf="!isUpdating"></span>
+        <ng-container *ngIf="isUpdating">Updating...</ng-container>
+        <ng-container *ngIf="!isUpdating">Save Changes</ng-container>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="popup-overlay" *ngIf="showLogoutPopup" (click)="closeLogoutPopup()">
+  <div class="popup-content" (click)="$event.stopPropagation()">
+    <div class="popup-header">
+      <span class="e-icons e-sign-out popup-icon"></span>
+      <p>Confirm Logout</p>
+    </div>
+
+    <div class="popup-body">
+      <p>Are you sure you want to logout?</p>
+      <p class="popup-subtitle">
+        You will need to login again to access the dashboard.
+      </p>
+    </div>
+
+    <div class="popup-footer">
+      <button class="btn-cancel" (click)="closeLogoutPopup()">Cancel</button>
+      <button class="btn-confirm" (click)="confirmLogout()">
+        <span class="e-icons e-sign-out"></span>
+        Logout
+      </button>
+    </div>
+  </div>
+</div>

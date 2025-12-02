@@ -1,0 +1,230 @@
+<div class="user-management-container">
+  <div class="header-section">
+    <h2>User Management</h2>
+    <button class="btn-create" (click)="openCreateModal()">
+      <span class="icon-plus">+</span>
+      Create User
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading">Loading users...</div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+
+  <!-- Users Table -->
+  <table *ngIf="!loading && users.length > 0" class="user-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Status</th>
+        <th>Roles</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let user of users">
+        <td>{{ user.id }}</td>
+        <td>{{ user.username }}</td>
+        <td>{{ user.email }}</td>
+        <td>
+          <span class="status" [class.active]="user.status === 'active'"
+                [class.inactive]="user.status === 'inactive'">
+            {{ user.status }}
+          </span>
+        </td>
+
+        <td>
+          <span class="role" *ngFor="let role of user.roles">
+            {{ role }}
+          </span>
+          <span *ngIf="!user.roles || user.roles.length === 0" class="no-role">
+            No roles
+          </span>
+        </td>
+
+        <td>
+          <div class="action-buttons">
+            <button class="btn-edit" (click)="openModal(user)">Edit</button>
+            <button class="btn-delete" (click)="openDeletePopup(user)">Delete</button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- No Users Message -->
+  <div *ngIf="!loading && users.length === 0" class="no-data">
+    No users found.
+  </div>
+
+  <!-- Edit Modal -->
+  <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal-box" (click)="$event.stopPropagation()">
+      <h3>Edit User</h3>
+
+      <div class="form-group">
+        <label>Username: <span class="required">*</span></label>
+        <input 
+          [(ngModel)]="editData.username" 
+          class="form-control"
+          [class.error]="editErrors.username"
+        />
+        <span class="error-text" *ngIf="editErrors.username">{{ editErrors.username }}</span>
+      </div>
+
+      <div class="form-group">
+        <label>Email: <span class="required">*</span></label>
+        <input 
+          [(ngModel)]="editData.email" 
+          class="form-control" 
+          type="email"
+          [class.error]="editErrors.email"
+        />
+        <span class="error-text" *ngIf="editErrors.email">{{ editErrors.email }}</span>
+      </div>
+
+      <div class="form-group">
+        <label>Status:</label>
+        <select [(ngModel)]="editData.status" class="form-control">
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Roles: <span class="required">*</span></label>
+        <div class="roles-container" *ngIf="!loadingRoles">
+          <div class="role-checkbox" *ngFor="let role of roles">
+            <label class="checkbox-label">
+              <input 
+                type="checkbox" 
+                [checked]="isRoleSelected(role.id)"
+                (change)="toggleRole(role.id)"
+              />
+              <span class="role-name">{{ role.name }}</span>
+              <span class="role-description" *ngIf="role.description">
+                {{ role.description }}
+              </span>
+            </label>
+          </div>
+        </div>
+        <div *ngIf="loadingRoles" class="loading-roles">
+          Loading roles...
+        </div>
+        <span class="error-text" *ngIf="editErrors.roles">{{ editErrors.roles }}</span>
+        <small class="helper-text">Select at least one role</small>
+      </div>
+
+      <div class="modal-buttons">
+        <button class="cancel-btn" (click)="closeModal()">Cancel</button>
+        <button class="save-btn" (click)="saveUser()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Popup -->
+  <div class="modal-overlay" *ngIf="showDeletePopup" (click)="cancelDelete()">
+    <div class="confirm-box" (click)="$event.stopPropagation()">
+      <div class="confirm-icon">⚠️</div>
+      <h3>Delete User?</h3>
+      <p>Are you sure you want to delete <strong>{{ selectedUserName }}</strong>?</p>
+      <p class="warning-text">This action cannot be undone.</p>
+
+      <div class="confirm-actions">
+        <button class="btn-no" (click)="cancelDelete()">Cancel</button>
+        <button class="btn-yes" (click)="confirmDelete()">Yes, Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create User Modal -->
+  <div class="modal-overlay" *ngIf="showCreateModal" (click)="closeCreateModal()">
+    <div class="modal-box" (click)="$event.stopPropagation()">
+      <h3>Create New User</h3>
+
+      <div class="form-group">
+        <label>Username: <span class="required">*</span></label>
+        <input 
+          [(ngModel)]="newUser.username" 
+          class="form-control"
+          placeholder="Enter username"
+          [class.error]="createErrors.username"
+        />
+        <span class="error-text" *ngIf="createErrors.username">{{ createErrors.username }}</span>
+      </div>
+
+      <div class="form-group">
+        <label>Email: <span class="required">*</span></label>
+        <input 
+          [(ngModel)]="newUser.email" 
+          class="form-control" 
+          type="email"
+          placeholder="Enter email"
+          [class.error]="createErrors.email"
+        />
+        <span class="error-text" *ngIf="createErrors.email">{{ createErrors.email }}</span>
+      </div>
+
+      <div class="form-group">
+        <label>Password: <span class="required">*</span></label>
+        <div class="password-wrapper">
+          <input 
+            [(ngModel)]="newUser.password" 
+            class="form-control" 
+            [type]="showCreatePassword ? 'text' : 'password'"
+            placeholder="Enter password (min 6 characters)"
+            [class.error]="createErrors.password"
+          />
+          <button 
+            type="button" 
+            class="password-toggle" 
+            (click)="toggleCreatePasswordVisibility()"
+          >
+            <span *ngIf="!showCreatePassword">👁️</span>
+            <span *ngIf="showCreatePassword">🙈</span>
+          </button>
+        </div>
+        <span class="error-text" *ngIf="createErrors.password">{{ createErrors.password }}</span>
+      </div>
+
+      <div class="form-group">
+        <label>Status:</label>
+        <select [(ngModel)]="newUser.status" class="form-control">
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Roles: <span class="required">*</span></label>
+        <div class="roles-container">
+          <div class="role-checkbox" *ngFor="let role of roles">
+            <label class="checkbox-label">
+              <input 
+                type="checkbox" 
+                [checked]="isCreateRoleSelected(role.id)"
+                (change)="toggleCreateRole(role.id)"
+              />
+              <span class="role-name">{{ role.name }}</span>
+              <span class="role-description" *ngIf="role.description">
+                {{ role.description }}
+              </span>
+            </label>
+          </div>
+        </div>
+        <span class="error-text" *ngIf="createErrors.roles">{{ createErrors.roles }}</span>
+        <small class="helper-text">Select at least one role</small>
+      </div>
+
+      <div class="modal-buttons">
+        <button class="cancel-btn" (click)="closeCreateModal()">Cancel</button>
+        <button class="save-btn" (click)="saveNewUser()">Create User</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,115 @@
+<div class="layout">
+  <!-- Sidebar -->
+  <div class="side-menu" [class.open]="menuOpen">
+    <!-- Profile Section - Now using ProfileComponent -->
+    <app-profile 
+      [showInSidebar]="true" 
+      (logoutClick)="handleLogout()">
+    </app-profile>
+
+    <ul>
+      <li (click)="goToStaffManagement()">Staff Management</li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content" [class.shrink]="menuOpen">
+    <div class="dashboard-container">
+      <!-- Top Bar -->
+      <button class="back-btn" (click)="goBack()">
+        <span class="e-icons e-chevron-left"></span> Back
+      </button>
+      <div class="dashboard-header top-bar">
+        <span class="hamburger" (click)="toggleMenu()">&#9776;</span>
+        <h1>Media Owners Dashboard</h1>
+
+        <button class="primary-btn" (click)="addStaff()">
+          <span class="e-icons e-plus"></span> Create Staff
+        </button>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="e-icons e-tv stat-icon"></span>
+          <div class="stat-content">
+            <h3>{{ stats.totalScreens }}</h3>
+            <p>Total Screens</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <span class="e-icons e-check-circle stat-icon active"></span>
+          <div class="stat-content">
+            <h3>{{ stats.activeScreens }}</h3>
+            <p>Active Screens</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <span class="e-icons e-dollar stat-icon"></span>
+          <div class="stat-content">
+            <h3>${{ stats.totalRevenue | number }}</h3>
+            <p>Total Revenue</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <span class="e-icons e-chart stat-icon"></span>
+          <div class="stat-content">
+            <h3>{{ stats.bookingRate }}%</h3>
+            <p>Booking Rate</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Inventory -->
+      <div class="inventory-section">
+        <h2>Screen Inventory</h2>
+
+        <div class="inventory-table">
+          <div class="table-header">
+            <div class="col">Location</div>
+            <div class="col">Type</div>
+            <div class="col">Status</div>
+            <div class="col">Revenue</div>
+            <div class="col">Actions</div>
+          </div>
+
+          <div class="table-row" *ngFor="let screen of screenInventory">
+            <div class="col">
+              <span class="e-icons e-location"></span>
+              {{ screen.location }}
+            </div>
+
+            <div class="col">{{ screen.type }}</div>
+
+            <div class="col">
+              <span class="status-badge" [class]="screen.status.toLowerCase()">
+                {{ screen.status }}
+              </span>
+            </div>
+
+            <div class="col">${{ screen.revenue | number }}</div>
+
+            <div class="col">
+              <button class="action-btn" (click)="viewScreen(screen)">
+                Manage
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overlay for mobile sidebar -->
+  <div class="overlay" *ngIf="menuOpen" (click)="toggleMenu()"></div>
+
+  <!-- Create Staff Popup -->
+  <app-create-staff
+    *ngIf="showCreateStaffPopup"
+    (close)="closeStaffPopup()"
+    (staffCreated)="onStaffCreated($event)"
+  ></app-create-staff>
+</div>

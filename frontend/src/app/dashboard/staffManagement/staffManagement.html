@@ -1,0 +1,102 @@
+<div class="staff-container" (click)="errorMessage=''">
+  <div class="staff-header">
+    <h2>Staff Management</h2>
+    <button
+      class="btn-create"
+      (click)="openCreateStaffPopup(); $event.stopPropagation()"
+    >
+      <span class="icon-plus">+</span>
+      Create Staff
+    </button>
+  </div>
+
+  <!-- ERROR MESSAGE POPUP -->
+  <div
+    *ngIf="errorMessage"
+    class="error-popup"
+    (click)="$event.stopPropagation()"
+  >
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <table class="staff-table">
+    <thead>
+      <tr>
+        <th>User ID</th>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Status</th>
+        <th>Role</th>
+        <th>Created At</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let staff of staffList">
+        <td>{{ staff.user_id }}</td>
+        <td>{{ staff.username }}</td>
+        <td>{{ staff.email }}</td>
+
+        <td>
+          <span class="status-badge" [ngClass]="staff.status">
+            {{ staff.status }}
+          </span>
+        </td>
+
+        <td>{{ staff.role_name }}</td>
+
+        <td>{{ staff.created_at | date:'medium' }}</td>
+
+        <td>
+          <div class="action-buttons">
+            <button
+              class="btn-edit"
+              (click)="openUpdateStaffPopup(staff); $event.stopPropagation()"
+              title="Edit Staff"
+            >
+              Edit
+            </button>
+            <button
+              class="btn-delete"
+              (click)="deleteStaff(staff.user_id); $event.stopPropagation()"
+              title="Delete Staff"
+            >
+              Delete
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Delete Confirmation Popup -->
+  <div class="confirm-popup" *ngIf="showDeletePopup" (click)="cancelDelete()">
+    <div class="confirm-box" (click)="$event.stopPropagation()">
+      <h3>Are you sure?</h3>
+      <p>You are about to delete this staff member.</p>
+
+      <div class="confirm-actions">
+        <button class="btn-yes" (click)="confirmDelete()">Yes, Delete</button>
+        <button class="btn-no" (click)="cancelDelete()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Staff Popup -->
+  <app-create-staff
+    *ngIf="showCreatePopup"
+    (close)="closeCreateStaffPopup()"
+    (staffCreated)="onStaffCreated($event)"
+    (click)="$event.stopPropagation()"
+  ></app-create-staff>
+
+  <!-- Update Staff Popup -->
+  <app-update-staff
+    *ngIf="showUpdatePopup"
+    [staffData]="selectedStaff"
+    (close)="closeUpdateStaffPopup()"
+    (staffUpdated)="onStaffUpdated($event)"
+    (click)="$event.stopPropagation()"
+  ></app-update-staff>
+</div>
