@@ -1,5 +1,10 @@
+# Global ignores
 backend/node_modules/
 frontend/node_modules/
+srs_adex_admin/node_modules/
 **/dist/
 **/build/
-**/.env
+*.env
+*.log
+
+# Angular local ignores allowed to stay
